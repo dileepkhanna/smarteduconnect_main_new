@@ -1,11 +1,11 @@
 # AWS Lightsail Deployment
 
-This project is safest on Lightsail with split origins:
+This project is deployed on Lightsail with the following setup:
 
-- frontend SPA: `https://app.example.com`
-- Laravel API: `https://api.example.com`
+- Frontend SPA: `https://smarteduconnect.com` (port 80/443)
+- Laravel API: `https://smarteduconnect.com:8080` (port 8080)
 
-The backend API currently uses root paths like `/auth`, `/gallery`, `/fees`, so putting frontend and backend on the same hostname will create route collisions with the SPA.
+The backend API uses port 8080 to avoid route collisions with the frontend SPA.
 
 ## 1. Frontend server
 
@@ -54,7 +54,7 @@ Use the sample config:
 Frontend `.env`:
 
 ```env
-VITE_API_BASE_URL=https://api.example.com
+VITE_API_BASE_URL=https://smarteduconnect.com:8080
 ```
 
 Backend `.env`:
@@ -62,8 +62,8 @@ Backend `.env`:
 ```env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://api.example.com
-FRONTEND_URL=https://app.example.com
+APP_URL=https://smarteduconnect.com:8080
+FRONTEND_URL=https://smarteduconnect.com
 ALLOWED_ORIGINS=
 FILESYSTEM_DISK=s3
 QUEUE_CONNECTION=database
@@ -73,7 +73,7 @@ SESSION_SECURE_COOKIE=true
 If you need an extra preview origin, add it to:
 
 ```env
-ALLOWED_ORIGINS=https://preview.example.com
+ALLOWED_ORIGINS=https://preview.smarteduconnect.com
 ```
 
 ## S3 storage configuration
@@ -159,15 +159,21 @@ sudo systemctl enable --now smarteduconnect-queue.service
 
 Point DNS:
 
-- `app.example.com` -> frontend instance/static distribution
-- `api.example.com` -> Lightsail instance
+- `smarteduconnect.com` -> Lightsail instance IP
+- `www.smarteduconnect.com` -> Lightsail instance IP
 
-Then issue TLS certificates with Certbot and update the sample Nginx configs.
+Then issue TLS certificates with Certbot:
+
+```bash
+sudo certbot --nginx -d smarteduconnect.com -d www.smarteduconnect.com
+```
+
+Note: You'll need to manually configure SSL for port 8080 or use a reverse proxy setup.
 
 ## 7. Post-deploy checks
 
-1. Open `https://app.example.com`
-2. Confirm login requests go to `https://api.example.com/auth/...`
+1. Open `https://smarteduconnect.com`
+2. Confirm login requests go to `https://smarteduconnect.com:8080/auth/...`
 3. Upload one file and confirm the stored URL is S3-based
 4. Confirm notifications and messaging API calls are not blocked by CORS
 
