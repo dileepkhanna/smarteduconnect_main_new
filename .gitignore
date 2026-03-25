@@ -1,0 +1,74 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Cache and temporary files
+*.cache
+.cache/
+tmp/
+temp/
+*.tmp
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# PHP specific
+composer.phar
+.phpunit.result.cache
+auth.json
+
+# Laravel specific (backend folder has its own .gitignore)
+storage/*.key
+storage/pail
+
+# Uploaded files and media (adjust based on your needs)
+uploads/
+public/uploads/
+
+# Package manager lock files (optional - uncomment if you don't want to track them)
+# composer.lock
+# package-lock.json
+# yarn.lock
+node_modules
