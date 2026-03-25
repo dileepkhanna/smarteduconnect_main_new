@@ -26,10 +26,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiClient.get<{ user: ApiUser }>('/auth/me');
       setUser(response.user);
       setUserRole((response.user.role?.role ?? null) as UserRole);
-    } catch {
-      setStoredToken(null);
-      setUser(null);
-      setUserRole(null);
+    } catch (error) {
+      // Only clear token on 401 Unauthorized, not on network errors
+      const is401 = error instanceof Error && error.message.includes('401');
+      if (is401) {
+        setStoredToken(null);
+        setUser(null);
+        setUserRole(null);
+      }
+      // On other errors (network issues), keep the token and retry later
     }
   };
 
