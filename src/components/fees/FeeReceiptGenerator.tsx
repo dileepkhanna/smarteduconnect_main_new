@@ -26,20 +26,24 @@ export async function generateFeeReceipt(data: ReceiptData) {
   const rightMargin = pageWidth - 14;
 
   const hasLogo = !!(t?.showLogo && t.logoUrl);
-  let logoLoaded: HTMLImageElement | null = null;
+
+  let logoDataUrl: string | null = null;
+  let logoFormat: string = 'PNG';
 
   if (hasLogo) {
     try {
-      logoLoaded = await loadImage(t!.logoUrl);
+      const result = await fetchImageAsDataUrl(t!.logoUrl);
+      logoDataUrl = result.dataUrl;
+      logoFormat = result.format;
     } catch {}
   }
 
   // School header block — logo centered on top, text centered below
-  if (logoLoaded) {
+  if (logoDataUrl) {
     const logoW = 22;
     const logoH = 22;
     const logoX = centerX - logoW / 2;
-    doc.addImage(logoLoaded, 'PNG', logoX, y, logoW, logoH);
+    doc.addImage(logoDataUrl, logoFormat, logoX, y, logoW, logoH);
     y += logoH + 4;
   }
 
@@ -153,12 +157,15 @@ export async function generateFeeReceipt(data: ReceiptData) {
   setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
 }
 
-function loadImage(url: string): Promise<HTMLImageElement> {
+async function fetchImageAsDataUrl(url: string): Promise<{ dataUrl: string; format: string }> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to fetch logo: ${response.status}`);
+  const blob = await response.blob();
+  const format = blob.type.includes('jpeg') || blob.type.includes('jpg') ? 'JPEG' : 'PNG';
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = url;
+    const reader = new FileReader();
+    reader.onload = () => resolve({ dataUrl: reader.result as string, format });
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
   });
 }

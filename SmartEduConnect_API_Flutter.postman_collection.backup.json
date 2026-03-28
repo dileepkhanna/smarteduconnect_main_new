@@ -1,0 +1,2614 @@
+{
+  "info": {
+    "name": "SmartEduConnect API - Flutter Developer Guide",
+    "description": "Complete API documentation with detailed field specifications for Flutter mobile app development",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "smarteduconnect-flutter-api",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://smarteduconnect.in:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "description": "All authentication related endpoints",
+      "item": [
+        {
+          "name": "Check Admin Exists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/admin-exists",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "admin-exists"]
+            },
+            "description": "**Purpose:** Check if admin user exists in the system\n\n**Auth Required:** No\n\n**Response Fields:**\n- `exists` (boolean): true if admin exists, false otherwise"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/auth/admin-exists"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"exists\": true\n}"
+            }
+          ]
+        }
+,
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "**Purpose:** Login with email and password\n\n**Auth Required:** No\n\n**Request Body Fields:**\n- `email` (string, required): User email address\n- `password` (string, required): User password\n\n**Response Fields:**\n- `token` (string): API authentication token (store this for subsequent requests)\n- `user` (object): User details\n  - `id` (integer): User ID\n  - `name` (string): User full name\n  - `email` (string): User email\n  - `created_at` (string): Account creation timestamp\n  - `updated_at` (string): Last update timestamp\n  - `profile` (object): User profile details\n    - `id` (integer): Profile ID\n    - `user_id` (integer): Associated user ID\n    - `full_name` (string): Full name\n    - `email` (string): Email\n    - `phone` (string|null): Phone number\n    - `address` (string|null): Address\n    - `photo_url` (string|null): Profile photo URL\n  - `role` (object): User role\n    - `id` (integer): Role ID\n    - `user_id` (integer): Associated user ID\n    - `role` (string): Role name (admin, teacher, parent)\n\n**Error Response (422):**\n- `message` (string): \"Invalid credentials\""
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"token\": \"a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\",\n  \"user\": {\n    \"id\": 1,\n    \"name\": \"Admin User\",\n    \"email\": \"admin@example.com\",\n    \"created_at\": \"2026-03-01T10:00:00.000000Z\",\n    \"updated_at\": \"2026-03-25T12:00:00.000000Z\",\n    \"profile\": {\n      \"id\": 1,\n      \"user_id\": 1,\n      \"full_name\": \"Admin User\",\n      \"email\": \"admin@example.com\",\n      \"phone\": \"+919876543210\",\n      \"address\": \"123 School Street\",\n      \"photo_url\": \"https://smarteduconnect.in:8080/storage/profiles/photo.jpg\"\n    },\n    \"role\": {\n      \"id\": 1,\n      \"user_id\": 1,\n      \"role\": \"admin\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Error - Invalid Credentials",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"wrong@example.com\",\n  \"password\": \"wrongpass\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login"
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"message\": \"Invalid credentials\"\n}"
+            }
+          ]
+        }
+,
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"parent\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "**Purpose:** Register new user (first user becomes admin automatically)\n\n**Auth Required:** No\n\n**Request Body Fields:**\n- `full_name` (string, required, max:255): User's full name\n- `email` (string, required, email, max:255): Unique email address\n- `password` (string, required, min:8): Password\n- `role` (string, optional): Role type - 'admin', 'teacher', or 'parent' (default: 'parent')\n\n**Response Fields:** Same as Login response\n- `token` (string): API authentication token\n- `user` (object): User details with profile and role\n\n**Note:** If no admin exists, the first registered user automatically becomes admin regardless of role parameter."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "**Purpose:** Get currently authenticated user details\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `user` (object): Complete user object with profile and role (same structure as login response)"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "**Purpose:** Logout current user and invalidate token\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `message` (string): \"Logged out\""
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Teacher Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacher_id\": \"TCH001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/resolve-teacher-email",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "resolve-teacher-email"]
+            },
+            "description": "**Purpose:** Get teacher's email by teacher ID (for password reset flows)\n\n**Auth Required:** No\n\n**Request Body Fields:**\n- `teacher_id` (string, required): Teacher ID\n\n**Response Fields:**\n- `email` (string): Teacher's email address\n\n**Error Response (404):**\n- `message` (string): \"Teacher not found\" or \"Teacher email not found\""
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Parent Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_identifier\": \"STU001\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/resolve-parent-email",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "resolve-parent-email"]
+            },
+            "description": "**Purpose:** Get parent's email by student admission number or login ID\n\n**Auth Required:** No\n\n**Request Body Fields:**\n- `student_identifier` (string, required): Student admission number or login ID\n\n**Response Fields:**\n- `email` (string): Parent's email address\n\n**Error Response (404):**\n- `message` (string): \"Student not found\", \"Parent account not found\", or \"Parent email not found\""
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "2. Dashboard",
+      "description": "Dashboard statistics and overview data",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/stats",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "stats"]
+            },
+            "description": "**Purpose:** Get dashboard statistics (role-specific data)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `students` (integer): Total number of students\n- `teachers` (integer): Total number of teachers\n- `classes` (integer): Total number of classes\n- `today_attendance_rate` (float): Today's attendance percentage (0-100)\n- `pending_leave_requests` (integer): Count of pending leave requests\n- `pending_certificate_requests` (integer): Count of pending certificate requests\n- `open_complaints` (integer): Count of open complaints\n- `latest_announcements` (array): Latest 4 announcements\n  - Each announcement object:\n    - `id` (integer): Announcement ID\n    - `title` (string): Announcement title\n    - `content` (string): Announcement content\n    - `class_id` (integer|null): Target class ID (null for all)\n    - `created_by` (integer): Creator user ID\n    - `created_at` (string): Creation timestamp\n    - `updated_at` (string): Update timestamp"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/dashboard/stats"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"students\": 450,\n  \"teachers\": 35,\n  \"classes\": 12,\n  \"today_attendance_rate\": 92.5,\n  \"pending_leave_requests\": 5,\n  \"pending_certificate_requests\": 3,\n  \"open_complaints\": 2,\n  \"latest_announcements\": [\n    {\n      \"id\": 1,\n      \"title\": \"Sports Day Announcement\",\n      \"content\": \"Annual sports day will be held on March 30th\",\n      \"class_id\": null,\n      \"created_by\": 1,\n      \"created_at\": \"2026-03-20T10:00:00.000000Z\",\n      \"updated_at\": \"2026-03-20T10:00:00.000000Z\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+,
+    {
+      "name": "3. Classes",
+      "description": "Class management endpoints",
+      "item": [
+        {
+          "name": "Get All Classes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/classes",
+              "host": ["{{base_url}}"],
+              "path": ["classes"]
+            },
+            "description": "**Purpose:** Get list of all classes\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of class objects"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Classes Management",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/classes/management",
+              "host": ["{{base_url}}"],
+              "path": ["classes", "management"]
+            },
+            "description": "**Purpose:** Get classes with management data (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**Response:** Array of class objects with student counts and teacher info"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Class",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Class 10\",\n  \"section\": \"A\",\n  \"class_teacher_id\": 1,\n  \"academic_year\": \"2026-2027\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/classes",
+              "host": ["{{base_url}}"],
+              "path": ["classes"]
+            },
+            "description": "**Purpose:** Create new class (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**Request Body Fields:**\n- `name` (string, required): Class name\n- `section` (string, required): Section name\n- `class_teacher_id` (integer, optional): Class teacher ID\n- `academic_year` (string, optional): Academic year\n\n**Response:** Created class object"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Class",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Class 10\",\n  \"section\": \"B\",\n  \"class_teacher_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/classes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["classes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update class (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Class ID\n\n**Request Body Fields:** Same as Create (all optional)\n\n**Response:** Updated class object"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Class",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/classes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["classes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Delete class (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Class ID\n\n**Response:** Success message"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Students",
+      "description": "Student management endpoints",
+      "item": [
+        {
+          "name": "Get All Students",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students?class_id=1&status=active",
+              "host": ["{{base_url}}"],
+              "path": ["students"],
+              "query": [
+                {
+                  "key": "class_id",
+                  "value": "1",
+                  "description": "Filter by class ID (optional)"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get list of all students\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `class_id` (integer, optional): Filter by class\n- `status` (string, optional): Filter by status\n\n**Response:** Array of student objects"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Students Directory",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/directory",
+              "host": ["{{base_url}}"],
+              "path": ["students", "directory"]
+            },
+            "description": "**Purpose:** Get students directory with basic info\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of student objects with minimal fields"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/:id",
+              "host": ["{{base_url}}"],
+              "path": ["students", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get specific student details\n\n**Auth Required:** Yes (Bearer Token)\n\n**URL Parameters:**\n- `id` (integer, required): Student ID\n\n**Response:** Single student object with all fields"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Attendance Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/:id/attendance-summary",
+              "host": ["{{base_url}}"],
+              "path": ["students", ":id", "attendance-summary"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get attendance summary for a specific student\n\n**Auth Required:** Yes (Bearer Token)\n\n**URL Parameters:**\n- `id` (integer, required): Student ID\n\n**Response Fields:**\n- `total_days` (integer): Total school days\n- `present_days` (integer): Days present\n- `absent_days` (integer): Days absent\n- `late_days` (integer): Days late\n- `attendance_percentage` (float): Attendance percentage"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Exam Marks",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/students/:id/exam-marks",
+              "host": ["{{base_url}}"],
+              "path": ["students", ":id", "exam-marks"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get exam marks for a specific student\n\n**Auth Required:** Yes (Bearer Token)\n\n**URL Parameters:**\n- `id` (integer, required): Student ID\n\n**Response:** Array of exam mark objects"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "5. Attendance",
+      "description": "Attendance management endpoints",
+      "item": [
+        {
+          "name": "Get Attendance Report",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attendance/report?class_id=1&date=2026-03-25",
+              "host": ["{{base_url}}"],
+              "path": ["attendance", "report"],
+              "query": [
+                {
+                  "key": "class_id",
+                  "value": "1",
+                  "description": "Class ID (required)"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-03-25",
+                  "description": "Date in YYYY-MM-DD format (required)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get attendance report for a class on a specific date\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `class_id` (integer, required): Class ID\n- `date` (string, required): Date in YYYY-MM-DD format\n\n**Response:** Array of attendance records\n- `id` (integer): Attendance record ID\n- `student_id` (integer): Student ID\n- `student_name` (string): Student full name\n- `date` (string): Attendance date\n- `status` (string): Status - 'present', 'absent', 'late', 'excused'\n- `remarks` (string|null): Remarks\n- `marked_by` (integer): User ID who marked attendance\n- `created_at` (string): Creation timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"class_id\": 1,\n  \"date\": \"2026-03-25\",\n  \"attendance\": [\n    {\n      \"student_id\": 1,\n      \"status\": \"present\"\n    },\n    {\n      \"student_id\": 2,\n      \"status\": \"absent\",\n      \"remarks\": \"Sick leave\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/attendance/mark",
+              "host": ["{{base_url}}"],
+              "path": ["attendance", "mark"]
+            },
+            "description": "**Purpose:** Mark attendance for students (teacher/admin only)\n\n**Auth Required:** Yes (Bearer Token) - Teacher or Admin role\n\n**Request Body Fields:**\n- `class_id` (integer, required): Class ID\n- `date` (string, required): Date in YYYY-MM-DD format\n- `attendance` (array, required): Array of attendance records\n  - `student_id` (integer, required): Student ID\n  - `status` (string, required): 'present', 'absent', 'late', or 'excused'\n  - `remarks` (string, optional): Additional remarks\n\n**Response:**\n- `message` (string): Success message\n- `marked_count` (integer): Number of records marked"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Exams",
+      "description": "Exam and marks management endpoints",
+      "item": [
+        {
+          "name": "Get Exams Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/exams/data",
+              "host": ["{{base_url}}"],
+              "path": ["exams", "data"]
+            },
+            "description": "**Purpose:** Get all exams data\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of exam objects\n- `id` (integer): Exam ID\n- `name` (string): Exam name\n- `exam_cycle_id` (integer): Exam cycle ID\n- `class_id` (integer): Class ID\n- `subject_id` (integer): Subject ID\n- `exam_date` (string): Exam date (YYYY-MM-DD)\n- `start_time` (string): Start time (HH:MM:SS)\n- `end_time` (string): End time (HH:MM:SS)\n- `total_marks` (float): Total marks\n- `passing_marks` (float): Passing marks\n- `created_at` (string): Creation timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Exam Cycles",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/exam-cycles",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "exam-cycles"]
+            },
+            "description": "**Purpose:** Get all exam cycles\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of exam cycle objects\n- `id` (integer): Cycle ID\n- `name` (string): Cycle name (e.g., \"Mid-Term 2026\")\n- `academic_year` (string): Academic year\n- `start_date` (string): Start date\n- `end_date` (string): End date\n- `is_active` (boolean): Active status"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "7. Notifications",
+      "description": "Notification and push notification endpoints",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications?page=1&per_page=20",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (optional, default: 1)"
+                },
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "description": "Items per page (optional, default: 20)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get all notifications for current user\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `page` (integer, optional): Page number (default: 1)\n- `per_page` (integer, optional): Items per page (default: 20)\n\n**Response:** Paginated notification list\n- `data` (array): Array of notification objects\n  - `id` (string): Notification UUID\n  - `type` (string): Notification type\n  - `notifiable_type` (string): User model type\n  - `notifiable_id` (integer): User ID\n  - `data` (object): Notification data\n    - `title` (string): Notification title\n    - `body` (string): Notification body\n    - `icon` (string|null): Icon URL\n    - `url` (string|null): Action URL\n  - `read_at` (string|null): Read timestamp (null if unread)\n  - `created_at` (string): Creation timestamp\n- `current_page` (integer): Current page\n- `total` (integer): Total notifications\n- `per_page` (integer): Items per page\n- `last_page` (integer): Last page number"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/unread-count",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "unread-count"]
+            },
+            "description": "**Purpose:** Get count of unread notifications\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `unread_count` (integer): Number of unread notifications"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notification_ids\": [\"uuid-1\", \"uuid-2\", \"uuid-3\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/notifications/mark-read",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "mark-read"]
+            },
+            "description": "**Purpose:** Mark notifications as read\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields:**\n- `notification_ids` (array, required): Array of notification UUIDs\n\n**Response Fields:**\n- `message` (string): Success message\n- `marked_count` (integer): Number of notifications marked as read"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/mark-all-read",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "mark-all-read"]
+            },
+            "description": "**Purpose:** Mark all notifications as read\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `message` (string): Success message"
+          },
+          "response": []
+        },
+        {
+          "name": "Get VAPID Public Key",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/push/vapid-key",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "push", "vapid-key"]
+            },
+            "description": "**Purpose:** Get VAPID public key for push notifications (Web Push)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `public_key` (string): VAPID public key\n\n**Note:** For Flutter, you may use FCM instead of Web Push"
+          },
+          "response": []
+        },
+        {
+          "name": "Subscribe to Push Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endpoint\": \"https://fcm.googleapis.com/fcm/send/device-token-here\",\n  \"keys\": {\n    \"p256dh\": \"public-key-here\",\n    \"auth\": \"auth-secret-here\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/notifications/push/subscribe",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "push", "subscribe"]
+            },
+            "description": "**Purpose:** Subscribe to push notifications\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields:**\n- `endpoint` (string, required): Push notification endpoint URL\n- `keys` (object, required): Encryption keys\n  - `p256dh` (string, required): Public key\n  - `auth` (string, required): Auth secret\n\n**Response Fields:**\n- `message` (string): Success message\n- `subscription_id` (integer): Subscription ID\n\n**Note:** For Flutter with FCM, you may need to adapt this endpoint or create a custom FCM token registration endpoint"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "8. Messages",
+      "description": "Messaging between users",
+      "item": [
+        {
+          "name": "Get Conversations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messaging/conversations",
+              "host": ["{{base_url}}"],
+              "path": ["messaging", "conversations"]
+            },
+            "description": "**Purpose:** Get list of all conversations for current user\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of conversation objects\n- `user_id` (integer): Other user's ID\n- `user_name` (string): Other user's name\n- `user_photo` (string|null): Other user's photo URL\n- `last_message` (string): Last message text\n- `last_message_time` (string): Last message timestamp\n- `unread_count` (integer): Unread messages count"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Messages",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messaging/messages?with_user_id=2&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["messaging", "messages"],
+              "query": [
+                {
+                  "key": "with_user_id",
+                  "value": "2",
+                  "description": "User ID to get messages with (required)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get messages with a specific user\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `with_user_id` (integer, required): User ID to get messages with\n- `page` (integer, optional): Page number for pagination\n\n**Response:** Paginated message list\n- `data` (array): Array of message objects\n  - `id` (integer): Message ID\n  - `from_user_id` (integer): Sender user ID\n  - `to_user_id` (integer): Recipient user ID\n  - `message` (string): Message text\n  - `is_read` (boolean): Read status\n  - `created_at` (string): Sent timestamp\n- `current_page` (integer): Current page\n- `total` (integer): Total messages\n- `per_page` (integer): Items per page"
+          },
+          "response": []
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to_user_id\": 2,\n  \"message\": \"Hello, this is a test message\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messaging/messages",
+              "host": ["{{base_url}}"],
+              "path": ["messaging", "messages"]
+            },
+            "description": "**Purpose:** Send a message to another user\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields:**\n- `to_user_id` (integer, required): Recipient user ID\n- `message` (string, required, max:1000): Message text\n\n**Response:** Created message object\n- `id` (integer): Message ID\n- `from_user_id` (integer): Sender user ID\n- `to_user_id` (integer): Recipient user ID\n- `message` (string): Message text\n- `is_read` (boolean): Read status (false)\n- `created_at` (string): Sent timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Messages as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messaging/mark-read",
+              "host": ["{{base_url}}"],
+              "path": ["messaging", "mark-read"]
+            },
+            "description": "**Purpose:** Mark messages as read\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields:**\n- `message_ids` (array, required): Array of message IDs\n\n**Response Fields:**\n- `message` (string): Success message\n- `marked_count` (integer): Number of messages marked as read"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "9. Profile",
+      "description": "User profile management",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            },
+            "description": "**Purpose:** Get current user profile\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response Fields:**\n- `id` (integer): Profile ID\n- `user_id` (integer): User ID\n- `full_name` (string): Full name\n- `email` (string): Email\n- `phone` (string|null): Phone number\n- `address` (string|null): Address\n- `photo_url` (string|null): Profile photo URL\n- `date_of_birth` (string|null): Date of birth\n- `gender` (string|null): Gender\n- `created_at` (string): Creation timestamp\n- `updated_at` (string): Update timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"John Doe Updated\",\n  \"phone\": \"+919876543210\",\n  \"address\": \"123 New Street, City\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"gender\": \"male\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            },
+            "description": "**Purpose:** Update user profile\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields (all optional):**\n- `full_name` (string, max:255): Full name\n- `phone` (string, max:20): Phone number\n- `address` (string, max:500): Address\n- `date_of_birth` (string): Date of birth (YYYY-MM-DD)\n- `gender` (string): Gender (male/female/other)\n\n**Response:** Updated profile object"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Profile Photo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": [],
+                  "description": "Image file (jpg, jpeg, png, max 2MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/profile/photo",
+              "host": ["{{base_url}}"],
+              "path": ["profile", "photo"]
+            },
+            "description": "**Purpose:** Upload profile photo\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body (multipart/form-data):**\n- `photo` (file, required): Image file (jpg, jpeg, png, max 2MB)\n\n**Response Fields:**\n- `message` (string): Success message\n- `photo_url` (string): URL of uploaded photo"
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"oldpassword123\",\n  \"new_password\": \"newpassword123\",\n  \"new_password_confirmation\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profile/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["profile", "change-password"]
+            },
+            "description": "**Purpose:** Change user password\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields:**\n- `current_password` (string, required): Current password\n- `new_password` (string, required, min:8): New password\n- `new_password_confirmation` (string, required): New password confirmation\n\n**Response Fields:**\n- `message` (string): Success message"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "10. Parent Portal",
+      "description": "Parent-specific endpoints",
+      "item": [
+        {
+          "name": "Get Children List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parent/children",
+              "host": ["{{base_url}}"],
+              "path": ["parent", "children"]
+            },
+            "description": "**Purpose:** Get list of parent's children\n\n**Auth Required:** Yes (Bearer Token) - Parent role\n\n**Response:** Array of student objects (parent's children)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Fees Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parent/fees-data",
+              "host": ["{{base_url}}"],
+              "path": ["parent", "fees-data"]
+            },
+            "description": "**Purpose:** Get fees data for parent's children\n\n**Auth Required:** Yes (Bearer Token) - Parent role\n\n**Response:** Array of fee records\n- `student_id` (integer): Student ID\n- `student_name` (string): Student name\n- `fee_type` (string): Fee type (tuition, transport, etc.)\n- `amount` (float): Fee amount\n- `due_date` (string): Due date\n- `status` (string): Payment status (paid/pending/overdue)\n- `paid_amount` (float): Amount paid\n- `balance` (float): Balance amount"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timetable Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parent/timetable-data",
+              "host": ["{{base_url}}"],
+              "path": ["parent", "timetable-data"]
+            },
+            "description": "**Purpose:** Get timetable for parent's children\n\n**Auth Required:** Yes (Bearer Token) - Parent role\n\n**Response:** Array of timetable entries\n- `student_id` (integer): Student ID\n- `student_name` (string): Student name\n- `day` (string): Day of week (Monday-Friday)\n- `period` (integer): Period number\n- `subject_name` (string): Subject name\n- `teacher_name` (string): Teacher name\n- `start_time` (string): Start time (HH:MM)\n- `end_time` (string): End time (HH:MM)\n- `room` (string|null): Room number"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Homework Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parent/homework-data",
+              "host": ["{{base_url}}"],
+              "path": ["parent", "homework-data"]
+            },
+            "description": "**Purpose:** Get homework for parent's children\n\n**Auth Required:** Yes (Bearer Token) - Parent role\n\n**Response:** Array of homework objects\n- `id` (integer): Homework ID\n- `student_id` (integer): Student ID\n- `student_name` (string): Student name\n- `subject_name` (string): Subject name\n- `title` (string): Homework title\n- `description` (string): Homework description\n- `assigned_date` (string): Assigned date\n- `due_date` (string): Due date\n- `status` (string): Status (pending/submitted/graded)\n- `submission_date` (string|null): Submission date\n- `marks` (float|null): Marks obtained\n- `feedback` (string|null): Teacher feedback"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Attendance Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parent/attendance-data?student_id=1&month=2026-03",
+              "host": ["{{base_url}}"],
+              "path": ["parent", "attendance-data"],
+              "query": [
+                {
+                  "key": "student_id",
+                  "value": "1",
+                  "description": "Student ID (optional, if not provided returns all children)"
+                },
+                {
+                  "key": "month",
+                  "value": "2026-03",
+                  "description": "Month in YYYY-MM format (optional, defaults to current month)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get attendance data for parent's children\n\n**Auth Required:** Yes (Bearer Token) - Parent role\n\n**Query Parameters:**\n- `student_id` (integer, optional): Specific student ID\n- `month` (string, optional): Month in YYYY-MM format\n\n**Response:** Array of attendance records"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "11. Teacher Portal",
+      "description": "Teacher-specific endpoints",
+      "item": [
+        {
+          "name": "Get Teacher Classes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teacher/classes",
+              "host": ["{{base_url}}"],
+              "path": ["teacher", "classes"]
+            },
+            "description": "**Purpose:** Get classes assigned to teacher\n\n**Auth Required:** Yes (Bearer Token) - Teacher role\n\n**Response:** Array of class objects assigned to teacher"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timetable Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teacher/timetable-data",
+              "host": ["{{base_url}}"],
+              "path": ["teacher", "timetable-data"]
+            },
+            "description": "**Purpose:** Get timetable for teacher\n\n**Auth Required:** Yes (Bearer Token) - Teacher role\n\n**Response:** Array of timetable entries for teacher's classes"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Students by Class",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teacher/classes/:class_id/students",
+              "host": ["{{base_url}}"],
+              "path": ["teacher", "classes", ":class_id", "students"],
+              "variable": [
+                {
+                  "key": "class_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get students in a specific class\n\n**Auth Required:** Yes (Bearer Token) - Teacher role\n\n**URL Parameters:**\n- `class_id` (integer, required): Class ID\n\n**Response:** Array of student objects in the class"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12. Announcements",
+      "description": "School announcements",
+      "item": [
+        {
+          "name": "Get Announcements",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/announcements?page=1",
+              "host": ["{{base_url}}"],
+              "path": ["announcements"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get all announcements (filtered by user role and class)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `page` (integer, optional): Page number\n\n**Response:** Paginated announcement list\n- `data` (array): Array of announcement objects\n  - `id` (integer): Announcement ID\n  - `title` (string): Title\n  - `content` (string): Content\n  - `class_id` (integer|null): Target class (null = all)\n  - `created_by` (integer): Creator user ID\n  - `created_at` (string): Creation timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sports Day Announcement\",\n  \"content\": \"Annual sports day will be held on March 30th\",\n  \"class_id\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/announcements",
+              "host": ["{{base_url}}"],
+              "path": ["announcements"]
+            },
+            "description": "**Purpose:** Create new announcement (admin/teacher only)\n\n**Auth Required:** Yes (Bearer Token) - Admin or Teacher role\n\n**Request Body Fields:**\n- `title` (string, required, max:255): Announcement title\n- `content` (string, required): Announcement content\n- `class_id` (integer|null, optional): Target class ID (null for all classes)\n\n**Response:** Created announcement object"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "13. Gallery",
+      "description": "School gallery and photos",
+      "item": [
+        {
+          "name": "Get Gallery Folders",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/gallery/folders",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "folders"]
+            },
+            "description": "**Purpose:** Get all gallery folders\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of folder objects\n- `id` (integer): Folder ID\n- `name` (string): Folder name\n- `description` (string|null): Folder description\n- `cover_image_url` (string|null): Cover image URL\n- `image_count` (integer): Number of images in folder\n- `created_at` (string): Creation timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Folder Images",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/gallery/folders/:id/images?page=1",
+              "host": ["{{base_url}}"],
+              "path": ["gallery", "folders", ":id", "images"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get images in a specific folder\n\n**Auth Required:** Yes (Bearer Token)\n\n**URL Parameters:**\n- `id` (integer, required): Folder ID\n\n**Query Parameters:**\n- `page` (integer, optional): Page number\n\n**Response:** Paginated image list\n- `data` (array): Array of image objects\n  - `id` (integer): Image ID\n  - `folder_id` (integer): Folder ID\n  - `image_url` (string): Image URL\n  - `thumbnail_url` (string): Thumbnail URL\n  - `caption` (string|null): Image caption\n  - `uploaded_at` (string): Upload timestamp"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "14. Holidays",
+      "description": "Holiday calendar management with recurring holidays support",
+      "item": [
+        {
+          "name": "Get Holidays",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/holidays?year=2026",
+              "host": ["{{base_url}}"],
+              "path": ["holidays"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026",
+                  "description": "Year in YYYY format (optional, defaults to current year)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get all holidays for a specific year (includes recurring holidays)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `year` (string, optional, format: YYYY): Year to fetch holidays for (defaults to current year)\n\n**Response:** Array of holiday objects\n- `id` (integer|string): Holiday ID (recurring holidays have format 'recurring_{id}_{year}')\n- `name` (string): Holiday name\n- `start_date` (string): Start date (YYYY-MM-DD)\n- `end_date` (string|null): End date (YYYY-MM-DD) - null for single-day holidays\n- `type` (string): Holiday type - 'national', 'religious', 'school', or 'optional'\n- `description` (string|null): Holiday description\n- `image_url` (string|null): Holiday image URL\n- `is_recurring` (boolean): Whether holiday recurs annually\n- `created_by` (integer): Creator user ID\n- `created_at` (string): Creation timestamp\n- `updated_at` (string): Update timestamp\n\n**Note:** Recurring holidays are automatically projected to the requested year"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/holidays?year=2026"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Independence Day\",\n    \"start_date\": \"2026-08-15\",\n    \"end_date\": null,\n    \"type\": \"national\",\n    \"description\": \"National Holiday\",\n    \"image_url\": \"https://smarteduconnect.in:8080/storage/holidays/independence.jpg\",\n    \"is_recurring\": true,\n    \"created_by\": 1,\n    \"created_at\": \"2026-03-01T10:00:00.000000Z\",\n    \"updated_at\": \"2026-03-01T10:00:00.000000Z\"\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Summer Vacation\",\n    \"start_date\": \"2026-05-01\",\n    \"end_date\": \"2026-06-15\",\n    \"type\": \"school\",\n    \"description\": \"Annual summer break\",\n    \"image_url\": null,\n    \"is_recurring\": false,\n    \"created_by\": 1,\n    \"created_at\": \"2026-03-01T10:00:00.000000Z\",\n    \"updated_at\": \"2026-03-01T10:00:00.000000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create Holiday",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Independence Day",
+                  "type": "text",
+                  "description": "Holiday name (required, max:255)"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2026-08-15",
+                  "type": "text",
+                  "description": "Start date in YYYY-MM-DD format (required)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "",
+                  "type": "text",
+                  "description": "End date in YYYY-MM-DD format (optional, for multi-day holidays)"
+                },
+                {
+                  "key": "type",
+                  "value": "national",
+                  "type": "text",
+                  "description": "Holiday type: national, religious, school, or optional (required)"
+                },
+                {
+                  "key": "description",
+                  "value": "National Holiday celebrating independence",
+                  "type": "text",
+                  "description": "Holiday description (optional)"
+                },
+                {
+                  "key": "is_recurring",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Whether holiday recurs annually: true or false (optional, default: false)"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Holiday image (optional, max 10MB, formats: jpg, jpeg, png, gif)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/holidays",
+              "host": ["{{base_url}}"],
+              "path": ["holidays"]
+            },
+            "description": "**Purpose:** Create new holiday (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**Request Body (multipart/form-data):**\n- `name` (string, required, max:255): Holiday name\n- `start_date` (string, required, format: YYYY-MM-DD): Start date\n- `end_date` (string, optional, format: YYYY-MM-DD): End date (must be >= start_date)\n- `type` (string, required): Holiday type - 'national', 'religious', 'school', or 'optional'\n- `description` (string, optional): Holiday description\n- `is_recurring` (boolean, optional): Whether holiday recurs annually (default: false)\n- `image` (file, optional): Holiday image (max 10MB, formats: jpg, jpeg, png, gif)\n\n**Response:** Created holiday object (same structure as GET response)\n\n**Error Response (403):**\n- `message` (string): \"Forbidden\" (non-admin users)\n\n**Error Response (422):**\n- `message` (string): Validation error or \"Image upload failed. Check storage permissions.\""
+          },
+          "response": []
+        },
+        {
+          "name": "Update Holiday",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Independence Day - Updated",
+                  "type": "text",
+                  "description": "Holiday name (required, max:255)"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2026-08-15",
+                  "type": "text",
+                  "description": "Start date in YYYY-MM-DD format (required)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "",
+                  "type": "text",
+                  "description": "End date in YYYY-MM-DD format (optional)"
+                },
+                {
+                  "key": "type",
+                  "value": "national",
+                  "type": "text",
+                  "description": "Holiday type (required)"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated description",
+                  "type": "text",
+                  "description": "Holiday description (optional)"
+                },
+                {
+                  "key": "is_recurring",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Whether holiday recurs annually (optional)"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "New holiday image (optional, replaces existing)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/holidays/:id",
+              "host": ["{{base_url}}"],
+              "path": ["holidays", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Holiday ID"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update existing holiday (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Holiday ID\n\n**Request Body (multipart/form-data):** Same fields as Create Holiday\n- All fields are required (provide existing values if not changing)\n- If new image is uploaded, old image is automatically deleted\n\n**Response:** Updated holiday object\n\n**Error Response (403):**\n- `message` (string): \"Forbidden\"\n\n**Error Response (404):**\n- `message` (string): \"Not Found\"\n\n**Note:** Use POST with _method=PUT for multipart/form-data if your HTTP client doesn't support PUT with files"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Holiday",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/holidays/:id",
+              "host": ["{{base_url}}"],
+              "path": ["holidays", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Holiday ID"
+                }
+              ]
+            },
+            "description": "**Purpose:** Delete holiday (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Holiday ID\n\n**Response:**\n- `message` (string): \"Deleted\"\n\n**Error Response (403):**\n- `message` (string): \"Forbidden\"\n\n**Error Response (404):**\n- `message` (string): \"Not Found\"\n\n**Note:** Associated image is automatically deleted from storage"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "15. Leave Requests",
+      "description": "Student leave request management",
+      "item": [
+        {
+          "name": "Get Leave Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leave-requests?status=pending",
+              "host": ["{{base_url}}"],
+              "path": ["leave-requests"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Filter by status: pending/approved/rejected (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get leave requests (role-based filtering)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `status` (string, optional): Filter by status (pending/approved/rejected)\n\n**Response:** Array of leave request objects\n- `id` (integer): Leave request ID\n- `student_id` (integer): Student ID\n- `student_name` (string): Student name\n- `from_date` (string): Start date (YYYY-MM-DD)\n- `to_date` (string): End date (YYYY-MM-DD)\n- `reason` (string): Leave reason\n- `status` (string): Status (pending/approved/rejected)\n- `approved_by` (integer|null): Approver user ID\n- `remarks` (string|null): Admin/teacher remarks\n- `created_at` (string): Request timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Leave Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 1,\n  \"from_date\": \"2026-03-26\",\n  \"to_date\": \"2026-03-27\",\n  \"reason\": \"Medical appointment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leave-requests",
+              "host": ["{{base_url}}"],
+              "path": ["leave-requests"]
+            },
+            "description": "**Purpose:** Create new leave request (parent only)\n\n**Auth Required:** Yes (Bearer Token) - Parent role\n\n**Request Body Fields:**\n- `student_id` (integer, required): Student ID (must be parent's child)\n- `from_date` (string, required): Start date (YYYY-MM-DD)\n- `to_date` (string, required): End date (YYYY-MM-DD)\n- `reason` (string, required, max:500): Leave reason\n\n**Response:** Created leave request object"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Leave Request Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"remarks\": \"Leave approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leave-requests/:id",
+              "host": ["{{base_url}}"],
+              "path": ["leave-requests", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update leave request status (admin/teacher only)\n\n**Auth Required:** Yes (Bearer Token) - Admin or Teacher role\n\n**URL Parameters:**\n- `id` (integer, required): Leave request ID\n\n**Request Body Fields:**\n- `status` (string, required): Status (approved/rejected)\n- `remarks` (string, optional, max:500): Admin/teacher remarks\n\n**Response:** Updated leave request object"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "16. Complaints",
+      "description": "Complaint management system",
+      "item": [
+        {
+          "name": "Get Complaints",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/complaints?status=open",
+              "host": ["{{base_url}}"],
+              "path": ["complaints"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "open",
+                  "description": "Filter by status: open/in_progress/resolved/closed (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get complaints (role-based filtering)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Query Parameters:**\n- `status` (string, optional): Filter by status\n\n**Response:** Array of complaint objects\n- `id` (integer): Complaint ID\n- `title` (string): Complaint title\n- `description` (string): Complaint description\n- `category` (string): Category (academic/infrastructure/staff/other)\n- `status` (string): Status (open/in_progress/resolved/closed)\n- `priority` (string): Priority (low/medium/high)\n- `submitted_by` (integer): Submitter user ID\n- `assigned_to` (integer|null): Assigned user ID\n- `resolution` (string|null): Resolution details\n- `created_at` (string): Submission timestamp\n- `updated_at` (string): Last update timestamp"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Complaint",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Broken desk in classroom\",\n  \"description\": \"The desk in row 3 is broken and needs repair\",\n  \"category\": \"infrastructure\",\n  \"priority\": \"medium\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/complaints",
+              "host": ["{{base_url}}"],
+              "path": ["complaints"]
+            },
+            "description": "**Purpose:** Create new complaint\n\n**Auth Required:** Yes (Bearer Token)\n\n**Request Body Fields:**\n- `title` (string, required, max:255): Complaint title\n- `description` (string, required): Detailed description\n- `category` (string, required): Category (academic/infrastructure/staff/other)\n- `priority` (string, optional): Priority (low/medium/high, default: medium)\n\n**Response:** Created complaint object"
+          },
+          "response": []
+        }
+      ]
+    }
+,
+    {
+      "name": "17. Subjects",
+      "description": "Subject management",
+      "item": [
+        {
+          "name": "Get All Subjects",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/subjects",
+              "host": ["{{base_url}}"],
+              "path": ["subjects"]
+            },
+            "description": "**Purpose:** Get all subjects\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of subject objects\n- `id` (integer): Subject ID\n- `name` (string): Subject name\n- `code` (string): Subject code\n- `category` (string): Category (core/elective/language)\n- `description` (string|null): Description\n- `created_at` (string): Creation timestamp"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "18. Teachers",
+      "description": "Teacher management",
+      "item": [
+        {
+          "name": "Get All Teachers",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teachers",
+              "host": ["{{base_url}}"],
+              "path": ["teachers"]
+            },
+            "description": "**Purpose:** Get all teachers with full details\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of teacher objects with complete information"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Teachers Basic",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teachers/basic",
+              "host": ["{{base_url}}"],
+              "path": ["teachers", "basic"]
+            },
+            "description": "**Purpose:** Get teachers with basic information (for dropdowns)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of teacher objects with minimal fields"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Teachers Management",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teachers/management",
+              "host": ["{{base_url}}"],
+              "path": ["teachers", "management"]
+            },
+            "description": "**Purpose:** Get teachers with management data (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**Response:** Array of teacher objects with management information"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Teacher",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacher_id\": \"TCH002\",\n  \"full_name\": \"Jane Smith\",\n  \"email\": \"jane@school.com\",\n  \"phone\": \"+1234567890\",\n  \"subjects\": [\"Chemistry\", \"Biology\"],\n  \"qualification\": \"M.Sc. Chemistry\",\n  \"joining_date\": \"2026-03-01\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/teachers",
+              "host": ["{{base_url}}"],
+              "path": ["teachers"]
+            },
+            "description": "**Purpose:** Create new teacher (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**Request Body Fields:**\n- `teacher_id` (string, required): Unique teacher ID\n- `full_name` (string, required): Full name\n- `email` (string, required): Email address\n- `phone` (string, optional): Phone number\n- `subjects` (array, optional): Array of subject names\n- `qualification` (string, optional): Educational qualification\n- `joining_date` (string, optional): Date of joining (YYYY-MM-DD)\n- `password` (string, required): Initial password\n\n**Response:** Created teacher object"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Teacher",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qualification\": \"Ph.D. Chemistry\",\n  \"phone\": \"+0987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/teachers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["teachers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update teacher details (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Teacher ID\n\n**Request Body Fields:** Same as Create (all optional)\n\n**Response:** Updated teacher object"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Teacher",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/teachers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["teachers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Delete teacher (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Teacher ID\n\n**Response:**\n- `message` (string): Success message"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Parents",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/parents",
+              "host": ["{{base_url}}"],
+              "path": ["parents"]
+            },
+            "description": "**Purpose:** Get all parents\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of parent objects"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "19. Certificate Requests",
+      "description": "Certificate request management",
+      "item": [
+        {
+          "name": "Get Certificate Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/certificates/requests",
+              "host": ["{{base_url}}"],
+              "path": ["certificates", "requests"]
+            },
+            "description": "**Purpose:** Get all certificate requests (role-based filtering)\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of certificate request objects\n- `id` (integer): Request ID\n- `student_id` (integer): Student ID\n- `student_name` (string): Student name\n- `certificate_type` (string): Type of certificate (bonafide, transfer, etc.)\n- `status` (string): Status (pending/approved/rejected)\n- `requested_at` (string): Request timestamp\n- `processed_at` (string|null): Processing timestamp\n- `processed_by` (integer|null): Processor user ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Certificate Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/certificates/requests/:id",
+              "host": ["{{base_url}}"],
+              "path": ["certificates", "requests", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update certificate request status (admin only)\n\n**Auth Required:** Yes (Bearer Token) - Admin role\n\n**URL Parameters:**\n- `id` (integer, required): Request ID\n\n**Request Body Fields:**\n- `status` (string, required): Status (approved/rejected)\n\n**Response:** Updated certificate request object"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "20. Weekly Exams",
+      "description": "Weekly competitive exam management (JEE/NEET)",
+      "item": [
+        {
+          "name": "Get Weekly Exams Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/weekly-exams/data",
+              "host": ["{{base_url}}"],
+              "path": ["weekly-exams", "data"]
+            },
+            "description": "**Purpose:** Get all weekly exams\n\n**Auth Required:** Yes (Bearer Token)\n\n**Response:** Array of weekly exam objects"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Weekly Exam",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"class_id\": 1,\n  \"subject_id\": 1,\n  \"syllabus_type\": \"competitive\",\n  \"exam_title\": \"JEE Mock Test 1\",\n  \"exam_date\": \"2026-04-01\",\n  \"exam_time\": \"10:00:00\",\n  \"duration_minutes\": 180,\n  \"total_marks\": 300,\n  \"negative_marking\": true,\n  \"negative_marks_value\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/weekly-exams",
+              "host": ["{{base_url}}"],
+              "path": ["weekly-exams"]
+            },
+            "description": "**Purpose:** Create weekly exam (admin/teacher)\n\n**Auth Required:** Yes (Bearer Token) - Admin or Teacher role\n\n**Request Body Fields:**\n- `class_id` (integer, required): Class ID\n- `subject_id` (integer, required): Subject ID\n- `syllabus_type` (string, required): Syllabus type (competitive/general)\n- `exam_title` (string, required): Exam title\n- `exam_date` (string, required): Exam date (YYYY-MM-DD)\n- `exam_time` (string, required): Exam time (HH:MM:SS)\n- `duration_minutes` (integer, required): Duration in minutes\n- `total_marks` (integer, required): Total marks\n- `negative_marking` (boolean, optional): Enable negative marking\n- `negative_marks_value` (float, optional): Negative marks per wrong answer\n\n**Response:** Created weekly exam object"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Weekly Exam",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exam_title\": \"JEE Mock Test 1 - Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/weekly-exams/:id",
+              "host": ["{{base_url}}"],
+              "path": ["weekly-exams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update weekly exam\n\n**Auth Required:** Yes (Bearer Token) - Admin or Teacher role\n\n**URL Parameters:**\n- `id` (integer, required): Weekly exam ID\n\n**Request Body Fields:** Same as Create (all optional)\n\n**Response:** Updated weekly exam object"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Weekly Exam",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/weekly-exams/:id",
+              "host": ["{{base_url}}"],
+              "path": ["weekly-exams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Delete weekly exam\n\n**Auth Required:** Yes (Bearer Token) - Admin or Teacher role\n\n**URL Parameters:**\n- `id` (integer, required): Weekly exam ID\n\n**Response:** Success message"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "21. Leads Management",
+      "description": "Student admission leads tracking",
+      "item": [
+        {
+          "name": "Get Leads",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads?status=new",
+              "host": ["{{base_url}}"],
+              "path": ["leads"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "new",
+                  "description": "Filter by status (optional)"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get all leads (admin/authorized teachers)\n\n**Auth Required:** Yes (Bearer Token) - Admin or authorized Teacher\n\n**Query Parameters:**\n- `status` (string, optional): Filter by status (new/contacted/interested/not_interested/enrolled)\n\n**Response:** Array of lead objects"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Lead",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_name\": \"New Student\",\n  \"parent_name\": \"Parent Name\",\n  \"phone\": \"+1234567890\",\n  \"email\": \"parent@example.com\",\n  \"class_interested\": \"Class 10\",\n  \"source\": \"website\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads",
+              "host": ["{{base_url}}"],
+              "path": ["leads"]
+            },
+            "description": "**Purpose:** Create new lead\n\n**Auth Required:** Yes (Bearer Token) - Admin or authorized Teacher\n\n**Request Body Fields:**\n- `student_name` (string, required): Student name\n- `parent_name` (string, required): Parent name\n- `phone` (string, required): Contact phone\n- `email` (string, optional): Email address\n- `class_interested` (string, required): Class interested in\n- `source` (string, optional): Lead source (website/referral/walk-in)\n\n**Response:** Created lead object"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Lead Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads/:id/details",
+              "host": ["{{base_url}}"],
+              "path": ["leads", ":id", "details"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Get lead details with call logs\n\n**Auth Required:** Yes (Bearer Token) - Admin or authorized Teacher\n\n**URL Parameters:**\n- `id` (integer, required): Lead ID\n\n**Response:** Lead object with call logs"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Call Log",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"call_date\": \"2026-03-24\",\n  \"call_time\": \"10:00:00\",\n  \"duration_minutes\": 15,\n  \"notes\": \"Discussed admission process\",\n  \"outcome\": \"interested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/:id/call-logs",
+              "host": ["{{base_url}}"],
+              "path": ["leads", ":id", "call-logs"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Add call log to lead\n\n**Auth Required:** Yes (Bearer Token) - Admin or authorized Teacher\n\n**URL Parameters:**\n- `id` (integer, required): Lead ID\n\n**Request Body Fields:**\n- `call_date` (string, required): Call date (YYYY-MM-DD)\n- `call_time` (string, required): Call time (HH:MM:SS)\n- `duration_minutes` (integer, optional): Call duration\n- `notes` (string, required): Call notes\n- `outcome` (string, optional): Call outcome\n\n**Response:** Created call log"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Lead Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"interested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["leads", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Update lead status\n\n**Auth Required:** Yes (Bearer Token) - Admin or authorized Teacher\n\n**URL Parameters:**\n- `id` (integer, required): Lead ID\n\n**Request Body Fields:**\n- `status` (string, required): Status (new/contacted/interested/not_interested/enrolled)\n\n**Response:** Updated lead object"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Lead",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads/:id",
+              "host": ["{{base_url}}"],
+              "path": ["leads", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "**Purpose:** Delete lead\n\n**Auth Required:** Yes (Bearer Token) - Admin or authorized Teacher\n\n**URL Parameters:**\n- `id` (integer, required): Lead ID\n\n**Response:** Success message"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
