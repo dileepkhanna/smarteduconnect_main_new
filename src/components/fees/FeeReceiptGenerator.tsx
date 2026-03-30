@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getApiBaseUrl, getStoredToken } from '@/lib/apiClient';
 import type { ReceiptTemplate } from './ReceiptTemplateSettings';
 
 interface ReceiptData {
@@ -32,7 +33,9 @@ export async function generateFeeReceipt(data: ReceiptData) {
 
   if (hasLogo) {
     try {
-      const result = await fetchImageAsDataUrl(t!.logoUrl);
+      // Use backend proxy to avoid S3 CORS issues
+      const proxyUrl = `${getApiBaseUrl()}/settings/receipt-template/logo-proxy`;
+      const result = await fetchImageAsDataUrl(proxyUrl, getStoredToken());
       logoDataUrl = result.dataUrl;
       logoFormat = result.format;
     } catch (err) {

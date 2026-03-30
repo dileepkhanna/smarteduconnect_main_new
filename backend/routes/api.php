@@ -100,12 +100,16 @@ Route::middleware('api.token')->group(function (): void {
     Route::put('/messaging/messages/{id}/read', [MessagingController::class, 'markRead'])->middleware('throttle:120,1');
     Route::get('/teachers', [CoreDataController::class, 'teachers']);
     Route::get('/teachers/basic', [CoreDataController::class, 'teachersBasic']);
+    Route::get('/admin/timetable/periods', [AdminTimetableController::class, 'indexPeriods']);
+    Route::post('/admin/timetable/periods', [AdminTimetableController::class, 'storePeriod']);
+    Route::put('/admin/timetable/periods/{id}', [AdminTimetableController::class, 'updatePeriod']);
     Route::get('/admin/timetable/management-data', [AdminTimetableController::class, 'managementData']);
     Route::get('/admin/timetable/class/{classId}', [AdminTimetableController::class, 'classTimetable']);
     Route::get('/admin/timetable/teacher/{teacherId}', [AdminTimetableController::class, 'teacherSchedule']);
     Route::post('/admin/timetable', [AdminTimetableController::class, 'store']);
     Route::put('/admin/timetable/publish-class', [AdminTimetableController::class, 'publishClass']);
     Route::put('/admin/timetable/{id}', [AdminTimetableController::class, 'update']);
+    Route::delete('/admin/timetable/periods/{id}', [AdminTimetableController::class, 'destroyPeriod']);
     Route::delete('/admin/timetable/{id}', [AdminTimetableController::class, 'destroy']);
     Route::put('/admin/timetable/{id}/publish', [AdminTimetableController::class, 'togglePublish']);
     Route::get('/admin/syllabus/data', [AdminSyllabusController::class, 'data']);

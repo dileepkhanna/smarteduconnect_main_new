@@ -521,18 +521,22 @@ class ParentPortalController extends Controller
             ->leftJoin('subjects', 'subjects.id', '=', 'timetable.subject_id')
             ->leftJoin('teachers', 'teachers.id', '=', 'timetable.teacher_id')
             ->leftJoin('profiles', 'profiles.user_id', '=', 'teachers.user_id')
+            ->leftJoin('periods', 'periods.id', '=', 'timetable.period_id')
             ->where('timetable.class_id', $student->class_id)
             ->where('timetable.is_published', true)
             ->select(
                 'timetable.id',
                 'timetable.day_of_week',
                 'timetable.period_number',
-                'timetable.start_time',
-                'timetable.end_time',
+                DB::raw('COALESCE(periods.start_time, timetable.start_time) as start_time'),
+                DB::raw('COALESCE(periods.end_time, timetable.end_time) as end_time'),
+                'periods.label as period_label',
+                'periods.type as period_type',
                 'subjects.name as subject_name',
                 'profiles.full_name as teacher_name'
             )
-            ->orderBy('timetable.period_number')
+            ->orderByRaw("FIELD(timetable.day_of_week,'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')")
+            ->orderBy('periods.period_number')
             ->get()
             ->map(fn ($row) => [
                 'id' => (string) $row->id,
@@ -540,6 +544,8 @@ class ParentPortalController extends Controller
                 'period_number' => (int) $row->period_number,
                 'start_time' => $row->start_time,
                 'end_time' => $row->end_time,
+                'period_label' => $row->period_label,
+                'period_type' => $row->period_type,
                 'subjects' => $row->subject_name ? ['name' => $row->subject_name] : null,
                 'teacherName' => $row->teacher_name,
             ]);
