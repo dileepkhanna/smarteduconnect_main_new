@@ -35,7 +35,9 @@ export async function generateFeeReceipt(data: ReceiptData) {
       const result = await fetchImageAsDataUrl(t!.logoUrl);
       logoDataUrl = result.dataUrl;
       logoFormat = result.format;
-    } catch {}
+    } catch (err) {
+      console.warn('Receipt logo could not be loaded:', err);
+    }
   }
 
   // School header block — logo centered on top, text centered below
@@ -158,14 +160,39 @@ export async function generateFeeReceipt(data: ReceiptData) {
 }
 
 async function fetchImageAsDataUrl(url: string): Promise<{ dataUrl: string; format: string }> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Failed to fetch logo: ${response.status}`);
-  const blob = await response.blob();
-  const format = blob.type.includes('jpeg') || blob.type.includes('jpg') ? 'JPEG' : 'PNG';
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve({ dataUrl: reader.result as string, format });
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+  // Try fetch with explicit CORS mode first
+  try {
+    const response = await fetch(url, { mode: 'cors' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob = await response.blob();
+    const format = blob.type.includes('jpeg') || blob.type.includes('jpg') ? 'JPEG' : 'PNG';
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({ dataUrl: reader.result as string, format });
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    // Fallback: load via HTMLImageElement + canvas (works when CORS headers are present)
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas not available')); return; }
+        ctx.drawImage(img, 0, 0);
+        const ext = url.split('?')[0].toLowerCase();
+        const isJpeg = ext.endsWith('.jpg') || ext.endsWith('.jpeg');
+        const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
+        const format = isJpeg ? 'JPEG' : 'PNG';
+        resolve({ dataUrl: canvas.toDataURL(mimeType), format });
+      };
+      img.onerror = () => reject(new Error('Image load failed'));
+      // Cache-bust to force CORS headers on cached responses
+      img.src = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+    });
+  }
 }
