@@ -9,20 +9,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::transaction(function (): void {
-            // 1. Add nullable period_id FK column
-            Schema::table('timetable', function (Blueprint $table): void {
-                $table->unsignedBigInteger('period_id')->nullable()->after('end_time');
-                $table->foreign('period_id')->references('id')->on('periods');
-            });
+        // Step 1: Add nullable period_id FK column (DDL — outside transaction)
+        Schema::table('timetable', function (Blueprint $table): void {
+            $table->unsignedBigInteger('period_id')->nullable()->after('end_time');
+            $table->foreign('period_id')->references('id')->on('periods');
+        });
 
-            // 2. Select distinct (period_number, start_time, end_time) combinations
+        // Step 2: Back-fill periods from existing timetable data (DML — safe in transaction)
+        DB::transaction(function (): void {
             $distinctPeriods = DB::table('timetable')
                 ->select('period_number', 'start_time', 'end_time')
                 ->distinct()
                 ->get();
 
-            // 3. For each distinct combination: insert a periods row and capture the new id
             foreach ($distinctPeriods as $p) {
                 $periodId = DB::table('periods')->insertGetId([
                     'period_number' => $p->period_number,
@@ -34,7 +33,6 @@ return new class extends Migration
                     'updated_at'    => now(),
                 ]);
 
-                // 4. UPDATE timetable SET period_id for rows matching this combination
                 DB::table('timetable')
                     ->where('period_number', $p->period_number)
                     ->where('start_time', $p->start_time)
@@ -42,18 +40,17 @@ return new class extends Migration
                     ->update(['period_id' => $periodId]);
             }
 
-            // 5. Assert zero null period_id rows remain
             $nullCount = DB::table('timetable')->whereNull('period_id')->count();
             if ($nullCount > 0) {
                 throw new \RuntimeException(
                     "Back-fill failed: {$nullCount} timetable row(s) still have a null period_id."
                 );
             }
+        });
 
-            // 6. Alter period_id column to NOT NULL
-            Schema::table('timetable', function (Blueprint $table): void {
-                $table->unsignedBigInteger('period_id')->nullable(false)->change();
-            });
+        // Step 3: Make period_id NOT NULL (DDL — outside transaction)
+        Schema::table('timetable', function (Blueprint $table): void {
+            $table->unsignedBigInteger('period_id')->nullable(false)->change();
         });
     }
 
