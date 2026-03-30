@@ -73,6 +73,7 @@ Route::middleware('api.token')->group(function (): void {
     Route::get('/settings/receipt-template', [FeesController::class, 'getReceiptTemplate']);
     Route::put('/settings/receipt-template', [FeesController::class, 'saveReceiptTemplate']);
     Route::post('/settings/receipt-template/logo', [FeesController::class, 'uploadReceiptLogo']);
+    Route::get('/settings/receipt-template/logo-proxy', [FeesController::class, 'proxyReceiptLogo']);
     Route::get('/settings/payment-gateway', [AdminSettingsController::class, 'paymentGateway']);
     Route::put('/settings/payment-gateway', [AdminSettingsController::class, 'updatePaymentGateway']);
     Route::post('/settings/invite-admin', [AdminSettingsController::class, 'inviteAdmin']);
@@ -103,13 +104,13 @@ Route::middleware('api.token')->group(function (): void {
     Route::get('/admin/timetable/periods', [AdminTimetableController::class, 'indexPeriods']);
     Route::post('/admin/timetable/periods', [AdminTimetableController::class, 'storePeriod']);
     Route::put('/admin/timetable/periods/{id}', [AdminTimetableController::class, 'updatePeriod']);
+    Route::delete('/admin/timetable/periods/{id}', [AdminTimetableController::class, 'destroyPeriod']);
     Route::get('/admin/timetable/management-data', [AdminTimetableController::class, 'managementData']);
     Route::get('/admin/timetable/class/{classId}', [AdminTimetableController::class, 'classTimetable']);
     Route::get('/admin/timetable/teacher/{teacherId}', [AdminTimetableController::class, 'teacherSchedule']);
     Route::post('/admin/timetable', [AdminTimetableController::class, 'store']);
     Route::put('/admin/timetable/publish-class', [AdminTimetableController::class, 'publishClass']);
     Route::put('/admin/timetable/{id}', [AdminTimetableController::class, 'update']);
-    Route::delete('/admin/timetable/periods/{id}', [AdminTimetableController::class, 'destroyPeriod']);
     Route::delete('/admin/timetable/{id}', [AdminTimetableController::class, 'destroy']);
     Route::put('/admin/timetable/{id}/publish', [AdminTimetableController::class, 'togglePublish']);
     Route::get('/admin/syllabus/data', [AdminSyllabusController::class, 'data']);

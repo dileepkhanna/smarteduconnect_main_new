@@ -282,7 +282,7 @@ class AdminTimetableController extends Controller
         $validated = $request->validate([
             'class_id'      => ['required', 'integer'],
             'day_of_week'   => ['required', 'string', 'max:20'],
-            'period_id'     => ['required', 'integer'],
+            'period_id'     => ['nullable', 'integer'],
             'period_number' => ['nullable', 'integer'],
             'subject_id'    => ['nullable', 'integer'],
             'teacher_id'    => ['nullable', 'integer'],
@@ -291,21 +291,27 @@ class AdminTimetableController extends Controller
             'is_published'  => ['nullable', 'boolean'],
         ]);
 
-        $period = DB::table('periods')->where('id', $validated['period_id'])->first();
+        $periodId     = null;
+        $periodNumber = $validated['period_number'] ?? null;
+        $startTime    = $validated['start_time'] ?? null;
+        $endTime      = $validated['end_time'] ?? null;
 
-        if (! $period) {
-            return response()->json(['message' => 'The selected period_id is invalid'], 422);
+        if (! empty($validated['period_id'])) {
+            $period = DB::table('periods')->where('id', $validated['period_id'])->first();
+            if (! $period) {
+                return response()->json(['message' => 'The selected period_id is invalid'], 422);
+            }
+            $periodId     = $period->id;
+            $periodNumber = $period->period_number;
+            $startTime    = $period->start_time;
+            $endTime      = $period->end_time;
         }
-
-        $periodNumber = $period->period_number;
-        $startTime    = $period->start_time;
-        $endTime      = $period->end_time;
 
         try {
             $id = DB::table('timetable')->insertGetId([
                 'class_id'      => $validated['class_id'],
                 'day_of_week'   => $validated['day_of_week'],
-                'period_id'     => $validated['period_id'],
+                'period_id'     => $periodId,
                 'period_number' => $periodNumber,
                 'subject_id'    => $validated['subject_id'] ?? null,
                 'teacher_id'    => $validated['teacher_id'] ?? null,
