@@ -115,6 +115,13 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
           (body as any).errors as Record<string, string[]>,
         );
       }
+      // Session expired or token invalid — clear token and redirect to login
+      // Skip this for auth endpoints themselves (login, register, etc.)
+      if (response.status === 401 && isJson && typeof body === 'object' && body && !path.startsWith('/auth/login') && !path.startsWith('/auth/register')) {
+        setStoredToken(null);
+        window.location.href = '/auth';
+        throw new Error('Session expired. Please log in again.');
+      }
       lastError = new Error(
         (isJson && typeof body === 'object' && body && 'message' in body
           ? String(body.message)

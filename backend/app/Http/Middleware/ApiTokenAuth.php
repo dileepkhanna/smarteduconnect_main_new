@@ -23,6 +23,13 @@ class ApiTokenAuth
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
+        if ($user->api_token_expires_at && now()->isAfter($user->api_token_expires_at)) {
+            $user->api_token = null;
+            $user->api_token_expires_at = null;
+            $user->save();
+            return response()->json(['message' => 'Session expired. Please log in again.', 'expired' => true], 401);
+        }
+
         auth()->setUser($user);
 
         return $next($request);

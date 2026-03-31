@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - img [ref=e7]
+      - heading "SmartEduConnect" [level=1] [ref=e10]
+      - paragraph [ref=e11]: School Management System
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - button "Staff Login" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Staff Login
+        - button "Parent / Student" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - generic [ref=e25]: Parent / Student
+      - generic [ref=e26]:
+        - heading "Parent & Student Portal" [level=3] [ref=e27]
+        - paragraph [ref=e28]: Login with Student ID provided by teacher
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - text: Student ID / Admission Number
+          - generic [ref=e32]:
+            - img [ref=e33]
+            - textbox "Student ID / Admission Number" [ref=e37]:
+              - /placeholder: e.g., JOHN-10-A
+              - text: vikas-1-a
+        - generic [ref=e38]:
+          - text: Password
+          - generic [ref=e39]:
+            - img [ref=e40]
+            - textbox "Password" [ref=e43]:
+              - /placeholder: Enter password
+              - text: "123456"
+        - button "Sign In" [ref=e44] [cursor=pointer]
+        - paragraph [ref=e46]: Use your child's Student ID and password provided by the teacher.
+    - paragraph [ref=e47]: By continuing, you agree to our Terms of Service
+```

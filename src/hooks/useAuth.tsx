@@ -27,14 +27,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(response.user);
       setUserRole((response.user.role?.role ?? null) as UserRole);
     } catch (error) {
-      // Only clear token on 401 Unauthorized, not on network errors
-      const is401 = error instanceof Error && error.message.includes('401');
-      if (is401) {
-        setStoredToken(null);
+      // The apiClient already handles expired sessions (expired: true) by
+      // clearing the token and redirecting. Here we only clear state if the
+      // token is genuinely gone from storage (e.g. cleared by another tab).
+      // For any other error (network, server down, etc.) keep the user logged
+      // in so a page refresh doesn't sign them out unexpectedly.
+      if (!getStoredToken()) {
         setUser(null);
+        setSession(null);
         setUserRole(null);
       }
-      // On other errors (network issues), keep the token and retry later
     }
   };
 

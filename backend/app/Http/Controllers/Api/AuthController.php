@@ -56,6 +56,7 @@ class AuthController extends Controller
 
         $plainToken = bin2hex(random_bytes(40));
         $user->api_token = hash('sha256', $plainToken);
+        $user->api_token_expires_at = now()->addWeek();
         $user->save();
 
         return response()->json([
@@ -74,11 +75,12 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 422);
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
         $plainToken = bin2hex(random_bytes(40));
         $user->api_token = hash('sha256', $plainToken);
+        $user->api_token_expires_at = now()->addWeek();
         $user->save();
 
         return response()->json([
@@ -157,6 +159,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user->api_token = null;
+        $user->api_token_expires_at = null;
         $user->save();
 
         return response()->json(['message' => 'Logged out']);

@@ -25,9 +25,9 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->group(function (): void {
     Route::get('/admin-exists', [AuthController::class, 'adminExists']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/resolve-teacher-email', [AuthController::class, 'resolveTeacherEmail']);
-    Route::post('/resolve-parent-email', [AuthController::class, 'resolveParentEmail']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::post('/resolve-teacher-email', [AuthController::class, 'resolveTeacherEmail'])->middleware('throttle:10,1');
+    Route::post('/resolve-parent-email', [AuthController::class, 'resolveParentEmail'])->middleware('throttle:10,1');
 });
 
 Route::middleware('api.token')->group(function (): void {
@@ -73,6 +73,7 @@ Route::middleware('api.token')->group(function (): void {
     Route::get('/settings/receipt-template', [FeesController::class, 'getReceiptTemplate']);
     Route::put('/settings/receipt-template', [FeesController::class, 'saveReceiptTemplate']);
     Route::post('/settings/receipt-template/logo', [FeesController::class, 'uploadReceiptLogo']);
+    Route::get('/settings/receipt-template/logo-proxy', [FeesController::class, 'proxyReceiptLogo']);
     Route::get('/settings/receipt-template/logo-proxy', [FeesController::class, 'proxyReceiptLogo']);
     Route::get('/settings/payment-gateway', [AdminSettingsController::class, 'paymentGateway']);
     Route::put('/settings/payment-gateway', [AdminSettingsController::class, 'updatePaymentGateway']);

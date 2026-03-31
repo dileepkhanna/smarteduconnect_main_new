@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'api_token',
+        'api_token_expires_at',
     ];
 
     /**
@@ -46,6 +47,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'api_token_expires_at' => 'datetime',
         ];
     }
 

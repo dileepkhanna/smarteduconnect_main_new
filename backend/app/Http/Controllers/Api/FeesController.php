@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class FeesController extends Controller
@@ -218,7 +219,7 @@ class FeesController extends Controller
 
         $newTotalPaid = $alreadyPaid + $enteredAmount;
         $newStatus = $newTotalPaid >= $netAmount ? 'paid' : 'partial';
-        $receiptNumber = 'RCP'.substr((string) now()->timestamp, -8);
+        $receiptNumber = 'RCP'.strtoupper(substr(Str::uuid()->toString(), 0, 8));
         $paidAt = now();
 
         DB::table('fees')->where('id', $id)->update([
@@ -329,7 +330,46 @@ class FeesController extends Controller
         return response()->json(['message' => 'Saved']);
     }
 
-    public function uploadReceiptLogo(Request $request): JsonResponse
+    public function proxyReceiptLogo(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    {
+        $setting = Schema::hasTable('app_settings')
+            ? DB::table('app_settings')->where('setting_key', 'receipt_template')->value('setting_value')
+            : null;
+
+        $template = $setting ? json_decode($setting, true) : [];
+        $logoUrl = is_array($template) ? ($template['logoUrl'] ?? '') : '';
+
+        if (! $logoUrl) {
+            return response()->json(['message' => 'No logo configured'], 404);
+        }
+
+        $path = $this->extractUploadPathFromUrl($logoUrl);
+
+        if ($path) {
+            $disk = $this->uploadDisk();
+            if (Storage::disk($disk)->exists($path)) {
+                $contents = Storage::disk($disk)->get($path);
+                $mime = Storage::disk($disk)->mimeType($path) ?: 'image/png';
+                return response($contents, 200)->header('Content-Type', $mime)->header('Cache-Control', 'private, max-age=3600');
+            }
+        }
+
+        // Fall back to proxying the URL directly (handles absolute URLs / S3 signed URLs)
+        try {
+            $client = new \Illuminate\Http\Client\Factory();
+            $response = \Illuminate\Support\Facades\Http::timeout(10)->get($logoUrl);
+            if ($response->successful()) {
+                $mime = $response->header('Content-Type') ?: 'image/png';
+                return response($response->body(), 200)->header('Content-Type', $mime)->header('Cache-Control', 'private, max-age=3600');
+            }
+        } catch (\Throwable) {
+            // fall through
+        }
+
+        return response()->json(['message' => 'Logo not found'], 404);
+    }
+
+
     {
         $validated = $request->validate([
             'logo' => ['required', 'image', 'max:5120'],

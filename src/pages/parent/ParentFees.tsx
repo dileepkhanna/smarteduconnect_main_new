@@ -33,6 +33,8 @@ interface Fee {
 interface Child {
   id: string;
   name: string;
+  admission_number?: string;
+  class_name?: string;
   fees: Fee[];
   payments: FeePayment[];
 }
@@ -74,7 +76,7 @@ declare global {
   }
 }
 
-function PaymentHistorySection({ payments, studentName }: { payments: FeePayment[]; studentName: string }) {
+function PaymentHistorySection({ payments, studentName, admissionNumber, className }: { payments: FeePayment[]; studentName: string; admissionNumber?: string; className?: string }) {
   const [template, setTemplate] = useState<ReceiptTemplate | null>(null);
 
   useEffect(() => {
@@ -108,6 +110,8 @@ function PaymentHistorySection({ payments, studentName }: { payments: FeePayment
                 generateFeeReceipt({
                   receiptNumber: p.receipt_number,
                   studentName,
+                  admissionNumber,
+                  className,
                   feeType: 'Payment',
                   amount: Number(p.amount),
                   paidAmount: Number(p.amount),
@@ -304,8 +308,11 @@ export default function ParentFees() {
     generateFeeReceipt({
       receiptNumber: fee.receipt_number,
       studentName: selectedChild?.name || '',
+      admissionNumber: selectedChild?.admission_number,
+      className: selectedChild?.class_name,
       feeType: fee.fee_type,
       amount: fee.amount,
+      discount: fee.discount ?? undefined,
       paidAmount: fee.paid_amount || 0,
       paidAt: fee.paid_at,
       template: receiptTemplate || undefined,
@@ -544,7 +551,7 @@ export default function ParentFees() {
         </Card>
 
         {/* Payment History */}
-        <PaymentHistorySection payments={selectedChild?.payments || []} studentName={selectedChild?.name || ''} />
+        <PaymentHistorySection payments={selectedChild?.payments || []} studentName={selectedChild?.name || ''} admissionNumber={selectedChild?.admission_number} className={selectedChild?.class_name} />
 
         {unpaidFees.length > 0 && (
           <Card className="card-elevated bg-primary/5 border-primary/20">

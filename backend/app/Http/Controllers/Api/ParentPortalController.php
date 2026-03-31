@@ -678,8 +678,9 @@ class ParentPortalController extends Controller
         }
 
         $students = DB::table('students')
-            ->whereIn('id', $studentIds)
-            ->select('id', 'full_name')
+            ->leftJoin('classes', 'classes.id', '=', 'students.class_id')
+            ->whereIn('students.id', $studentIds)
+            ->select('students.id', 'students.full_name', 'students.admission_number', 'classes.name as class_name', 'classes.section as class_section')
             ->get();
 
         $fees = Schema::hasTable('fees')
@@ -718,6 +719,8 @@ class ParentPortalController extends Controller
             return [
                 'id' => (string) $student->id,
                 'name' => $student->full_name,
+                'admission_number' => $student->admission_number ?? null,
+                'class_name' => $student->class_name ? $student->class_name.'-'.$student->class_section : null,
                 'fees' => $studentFeeRows->map(fn ($fee) => [
                     'id' => (string) $fee->id,
                     'fee_type' => $fee->fee_type,
